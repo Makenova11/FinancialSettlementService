@@ -12,8 +12,6 @@ namespace FinancialSettlementService.Models
         /// Баланс.
         /// </summary>
         [Required(ErrorMessage = "Баланс не может быть пустым.")]
-        [VerifyFormat(TypeName:"decimal")]
-        [NoNegativeValue]
         public decimal Balance { get; set; }
 
         /// <summary>

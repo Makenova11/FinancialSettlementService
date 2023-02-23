@@ -11,28 +11,25 @@ namespace FinancialSettlementService.Models
         /// <summary>
         /// Имя.
         /// </summary>
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Поле 'Имя' обязательно для заполнения.")]
-        [VerifyFormat(TypeName: "string")]
+        [Required]
         public string FirstName { get; set; } = string.Empty;
 
         /// <summary>
         /// Фамилия.
         /// </summary>
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Поле 'Фамилия' обязательно для заполнения.")]
-        [VerifyFormat(TypeName: "string")]
+        [Required]
         public string SecondName { get; set; } = string.Empty;
 
         /// <summary>
         /// День рождения.
         /// </summary>
         [Required]
-        [DataType(DataType.Date, ErrorMessage = "Некорректный формат даты.")]
+        [DataType(DataType.DateTime, ErrorMessage = "Некорректный формат даты.")]
         public DateTime BirthDay { get; set; }
 
         /// <summary>
         /// Отчество.
         /// </summary>
-        [VerifyFormat(TypeName: "string")]
         public string? Patronymic { get; set; }
 
         /// <summary>
