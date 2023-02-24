@@ -1,10 +1,9 @@
-﻿using FinancialSettlementService.Dtos;
-using FinancialSettlementService.Interfaces;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
-namespace FinancialSettlementService.Controllers
+﻿namespace FinancialSettlementService.Controllers
 {
+    using FinancialSettlementService.Dtos;
+    using FinancialSettlementService.Interfaces;
+    using Microsoft.AspNetCore.Mvc;
+
     /// <summary>
     /// Контроллер для работы с клиентами.
     /// </summary>
@@ -20,19 +19,37 @@ namespace FinancialSettlementService.Controllers
         }
 
         /// <summary>
-        /// Зарегистрировать нового пользователя.
+        /// Зарегистрировать клиента.
         /// </summary>
         /// <param name="clientDto"> Данные нового пользователя. </param>
         /// <param name="cancellationToken"> Структура для отмены операций между потоками. </param>
-        /// <returns> IActionResult. </returns>
+        /// <returns> Id нового клиента. </returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ClientDto))]
         public async Task<IActionResult> SignUpAsync([FromBody] ClientDto clientDto,
             CancellationToken cancellationToken)
         {
-            await _clientRepository.SignUpAsync(clientDto, cancellationToken);
+            var client = await _clientRepository.SignUpAsync(clientDto, cancellationToken);
 
-            return CreatedAtAction("Sign Up", clientDto);
+            return CreatedAtAction("GetClient", new {guid = client.Id});
+        }
+
+        /// <summary>
+        /// Провести поиск клиента по базе.
+        /// </summary>
+        /// <param name="Guid"> Идентификатор клиента. </param>
+        /// <returns> Информация о клиенте. </returns>
+        [HttpGet("Guid")]
+        [ActionName("GetClient")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ClientInformationDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ClientInformationDto))]
+        public async Task<IActionResult> GetById(Guid Guid)
+        {
+            var client = await _clientRepository.GetByIdAsync(Guid);
+
+            if (client is null)
+                return NotFound($"Клиент с индентификатором {Guid} не найден.");
+            return Ok(client);
         }
     }
 }

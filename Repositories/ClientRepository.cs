@@ -1,35 +1,37 @@
-﻿using FinancialSettlementService.Dtos;
-using FinancialSettlementService.Interfaces;
-using FinancialSettlementService.Models;
-
-namespace FinancialSettlementService.Repositories
+﻿namespace FinancialSettlementService.Repositories
 {
+    using FinancialSettlementService.Dtos;
+    using FinancialSettlementService.Interfaces;
+    using FinancialSettlementService.Models;
+    using FinancialSettlementService.MapsterConfiguration;
+    using MapsterMapper;
+
     /// <inheritdoc cref="IClientRepository"/>
     public class ClientRepository : IClientRepository
     {
         /// <inheritdoc cref="BankDbContext"/>
         private readonly BankDbContext _dbContext;
-        public ClientRepository(BankDbContext dbContext)
+
+        /// <inheritdoc cref="MappingConfiguration"/>
+        private readonly IMapper _mapper;
+        public ClientRepository(BankDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         /// <inheritdoc/>
-        public Task<ClientDto> GetByIdAsync(Guid id)
+        public async Task<ClientInformationDto> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
-        }
+            var client = _dbContext.Clients.SingleOrDefault(client => client.Id == id);
 
+            return _mapper.Map<ClientInformationDto>(client);
+        }
+            
         /// <inheritdoc/>
-        public async Task SignUpAsync (ClientDto clientDto, CancellationToken cancellationToken)
+        public async Task<Client> SignUpAsync (ClientDto clientDto, CancellationToken cancellationToken)
         {
-            var client = new Client
-            {
-                FirstName = clientDto.FirstName,
-                SecondName = clientDto.SecondName,
-                BirthDay = DateTime.Parse(clientDto.BirthDay),
-                Patronymic = clientDto.Patronymic,
-            };
+            var client = _mapper.Map<Client>(clientDto);
             var balanceAccount = new BalanceAccount
             {
                 Balance = clientDto.Balance,
@@ -40,6 +42,8 @@ namespace FinancialSettlementService.Repositories
             await _dbContext.AddAsync(balanceAccount, cancellationToken);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return client;
         }
     }
 }
