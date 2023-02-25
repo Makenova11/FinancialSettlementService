@@ -43,12 +43,12 @@
         [ActionName("GetClient")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ClientInformationDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ClientInformationDto))]
-        public async Task<IActionResult> GetById(Guid Guid)
+        public async Task<IActionResult> GetById(Guid guid)
         {
-            var client = await _clientRepository.GetByIdAsync(Guid);
+            var client = await _clientRepository.GetByIdAsync(guid);
 
             if (client is null)
-                return NotFound($"Клиент с индентификатором {Guid} не найден.");
+                return NotFound($"Клиент с индентификатором {guid} не найден.");
             return Ok(client);
         }
     }
