@@ -1,8 +1,8 @@
-﻿using FinancialSettlementService.Models;
-using Microsoft.EntityFrameworkCore;
-
-namespace FinancialSettlementService.DI
+﻿namespace FinancialSettlementService.DI
 {
+    using FinancialSettlementService.Models;
+    using Microsoft.EntityFrameworkCore;
+
     /// <summary>
     /// Добавление зависимостей бд.
     /// </summary>

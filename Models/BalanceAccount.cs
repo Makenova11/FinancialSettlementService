@@ -1,8 +1,8 @@
-﻿using FinancialSettlementService.Validations;
-using System.ComponentModel.DataAnnotations;
-
-namespace FinancialSettlementService.Models
+﻿namespace FinancialSettlementService.Models
 {
+    using FinancialSettlementService.Validations;
+    using System.ComponentModel.DataAnnotations;
+
     /// <summary>
     /// Банковский счёт.
     /// </summary>

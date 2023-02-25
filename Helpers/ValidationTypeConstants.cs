@@ -19,5 +19,10 @@
         /// Константа, описывающая тип decimal.
         /// </summary>
         public const string SystemDecimal = "System.Decimal";
+
+        /// <summary>
+        /// Константа, описывающая ограничение негативного баланса.
+        /// </summary>
+        public const string NoNegativeBalanceConstraint = "NoNegativeBalanceConstraint";
     }
 }

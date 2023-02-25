@@ -22,7 +22,7 @@
                 .Map(dest => dest.BirthDay, source => ConvertStringToDateTime(source.BirthDay));
             config.NewConfig<Client, ClientInformationDto>()
                 .Map(dest => dest.BirthDay, 
-                source => ConvertDateTimeToString(source.BirthDay));
+                source => ConvertDateTimeToString(source.BirthDay, _dateTimeFormat));
         }
 
         /// <summary>
@@ -32,8 +32,10 @@
         /// <returns> DateTime в заданном формате. </returns>
         private DateTime ConvertStringToDateTime(string dateTimeString) 
         {
-            return DateTime.ParseExact(dateTimeString, _dateTimeFormat,
+            var dateWithoutKind = DateTime.ParseExact(dateTimeString, _dateTimeFormat,
                 CultureInfo.InvariantCulture, DateTimeStyles.None);
+
+            return DateTime.SpecifyKind(dateWithoutKind, DateTimeKind.Utc);
         }
 
         /// <summary>
@@ -41,9 +43,7 @@
         /// </summary>
         /// <param name="dateTimeString"> Строка для преобразования. </param>
         /// <returns> Строка в заданном формате. </returns>
-        private static string ConvertDateTimeToString(DateTime dateTimeString)
-        {
-            return dateTimeString.AddHours(dateTimeString.Hour).ToShortDateString();
-        }
+        private static string ConvertDateTimeToString(DateTime dateTimeString, string _dateTimeFormat) 
+            => dateTimeString.ToString(_dateTimeFormat);
     }
 }

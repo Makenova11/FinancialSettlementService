@@ -19,8 +19,10 @@ namespace FinancialSettlementService.Validations
 
         public override bool IsValid(object value)
         {
-            var TypeObject = Type.GetType(_TypeName);
-            return value.GetType() == TypeObject;
+            var TypeObject = Type.GetType(_TypeName).FullName;
+            var ValueType = value.GetType().FullName;
+
+            return TypeObject == ValueType;
         }
     }
 }

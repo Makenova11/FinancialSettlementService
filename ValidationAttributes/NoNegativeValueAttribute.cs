@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace FinancialSettlementService.Validations
+﻿namespace FinancialSettlementService.Validations
 {
+    using System.ComponentModel.DataAnnotations;
+
     /// <summary>
     /// Атрибут проверки на отрицательные числа.
     /// </summary>
