@@ -12,10 +12,7 @@
     public class MappingConfiguration : IRegister
     {
         private readonly string _dateTimeFormat = ValidationTypeConstants.DateTimeFormat;
-
-        public MappingConfiguration()
-        {
-        }
+        public MappingConfiguration() { }
         public void Register(TypeAdapterConfig config)
         {
             config.NewConfig<ClientDto, Client>()

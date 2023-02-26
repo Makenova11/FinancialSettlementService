@@ -1,7 +1,9 @@
 ﻿namespace FinancialSettlementService.Controllers
 {
+    using FinancialSettlementService.Helpers;
     using FinancialSettlementService.Interfaces;
     using Microsoft.AspNetCore.Mvc;
+    using Npgsql;
 
     /// <summary>
     /// Контроллер взаимодействия со счётом клиента.
@@ -47,7 +49,7 @@
         /// <param name="amount"> Сумма пополнения. </param>
         /// <param name="cancellationToken"> Структура для отмены операций между потоками. </param>
         /// <returns> IActionResult. </returns>
-        [HttpPatch("deposit")]
+        [HttpPatch("deposit/{guid}/{amount}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -55,9 +57,16 @@
         {
             var client = await _clientRepository.GetByIdAsync(guid);
 
-            if (client is null)
-                return NotFound($"Клиент с индентификатором {guid} не найден.");
-            await _balanceRepository.DepositIntoAsync(client.Id, amount, cancellationToken);
+            try
+            {
+                if (client is null)
+                    return NotFound($"Клиент с индентификатором {guid} не найден.");
+                await _balanceRepository.DepositIntoAsync(client.Id, amount, cancellationToken);
+            }
+            catch
+            {
+                return BadRequest("Не удалось пополнить баланс.");
+            }
 
             var balance = await _balanceRepository.CheckBalanceAsync(client.Id, cancellationToken);
 
@@ -65,27 +74,39 @@
         }
 
         /// <summary>
-        /// Внести деньги на счёт.
+        /// Снять деньги со счёта.
         /// </summary>
         /// <param name="guid"> Идентификатор клиента. </param>
-        /// <param name="amount"> Сумма пополнения. </param>
+        /// <param name="amount"> Сумма снятия. </param>
         /// <param name="cancellationToken"> Структура для отмены операций между потоками. </param>
         /// <returns> IActionResult. </returns>
-        [HttpPatch("withdraw")]
+        [HttpPatch("withdraw/{guid}/{amount}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> WithdrawAsync(Guid guid, decimal amount, CancellationToken cancellationToken)
         {
             var client = await _clientRepository.GetByIdAsync(guid);
 
-            if (client is null)
-                return NotFound($"Клиент с индентификатором {guid} не найден.");
-            await _balanceRepository.WithdrawFromAsync(client.Id, amount, cancellationToken);
+            try
+            {
+                if (client is null)
+                    return NotFound($"Клиент с индентификатором {guid} не найден.");
+                await _balanceRepository.WithdrawFromAsync(client.Id, amount, cancellationToken);
+            }
+            catch (PostgresException ex) when (ex.ConstraintName == ValidationTypeConstants.NoNegativeBalanceConstraint)
+            {
+                return BadRequest("Ошибка! Недостаточно средств на счёте.");
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Не удалось снять деньги со счёта.");
+            }
 
             var balance = await _balanceRepository.CheckBalanceAsync(client.Id, cancellationToken);
 
-            return Ok($"Текущий баланс:{balance}");
+            return Ok($"Баланс после снятия средств:{balance}");
         }
     }
 }
